@@ -17,8 +17,12 @@ const ContactForm = () => {
   const [error, setError] = useState('')
   const [ipAddress, setIpAddress] = useState('')
   const [geoAddress, setGeoAddress] = useState(null)
+  const [alreadySubmitted, setAlreadySubmitted] = useState(false)
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && localStorage.getItem('_lsub_done') === '1') {
+      setAlreadySubmitted(true)
+    }
     getGeo().then(d => {
       if (!d) return
       setIpAddress(d.ip || '')
@@ -50,7 +54,10 @@ const ContactForm = () => {
     try {
       const res = await fetch(API_ENDPOINT, { method: 'POST', body: payload })
       const data = await res.json()
-      if (data.status) setSuccess(true)
+      if (data.status) {
+        if (typeof window !== 'undefined') localStorage.setItem('_lsub_done', '1')
+        setSuccess(true)
+      }
       else setError(data.msg || 'Something went wrong.')
     } catch { setError('Network error. Please try again.') }
     finally { setLoading(false) }
@@ -110,13 +117,24 @@ const ContactForm = () => {
         </span>
       </label>
 
-      <button type="submit" disabled={loading}
+      <button type="submit" disabled={loading || alreadySubmitted}
         className="btn-gold w-full"
-        style={{ padding: '14px', marginTop: '4px' }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-        </svg>
-        {loading ? 'Submitting...' : 'Submit Details'}
+        style={{ padding: '14px', marginTop: '4px', opacity: alreadySubmitted ? 0.55 : 1, cursor: alreadySubmitted ? 'not-allowed' : 'pointer' }}>
+        {alreadySubmitted ? (
+          <>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Already Submitted
+          </>
+        ) : (
+          <>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+            {loading ? 'Submitting...' : 'Submit Details'}
+          </>
+        )}
       </button>
     </form>
   )
