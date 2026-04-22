@@ -36,14 +36,14 @@ export const metadata = {
   description: 'Explore Godrej Vanantara on Bannerghatta Road, Bangalore. Premium 2, 3 & 4 BHK homes with modern amenities. Get price, floor plans & offers.',
   icons: {
     icon: [
-      { url: '/images/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/images/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/images/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
     ],
-    apple: [{ url: '/images/apple-touch-icon.png', sizes: '180x180' }],
-    shortcut: '/favicon.ico',
+    apple: [{ url: '/favicon/apple-touch-icon.png', sizes: '180x180' }],
+    shortcut: '/favicon/favicon.ico',
   },
-  manifest: '/site.webmanifest',
+  manifest: '/favicon/site.webmanifest',
 }
 
 export default function RootLayout({ children }) {
