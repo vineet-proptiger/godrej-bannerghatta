@@ -20,6 +20,10 @@ const LeadForm = ({ formName = 'Hero Form', btnText = 'Submit Details' }) => {
   const honeypotRef = useRef(null)
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && localStorage.getItem('_lsub_done') === '1') {
+      setSuccess(true)
+      return
+    }
     getGeo().then(d => {
       if (!d) return
       setIpAddress(d.ip || '')
@@ -41,8 +45,7 @@ const LeadForm = ({ formName = 'Hero Form', btnText = 'Submit Details' }) => {
 
     /* ── Duplicate submission check ── */
     if (typeof window !== 'undefined') {
-      const fingerprint = `${window.location.href}|${formData.phone}`
-      if (localStorage.getItem('_lsub') === fingerprint) { setSuccess(true); return }
+      if (localStorage.getItem('_lsub_done') === '1') { setSuccess(true); return }
     }
 
     setError(''); setLoading(true)
@@ -65,7 +68,7 @@ const LeadForm = ({ formName = 'Hero Form', btnText = 'Submit Details' }) => {
       if (data.status) {
         setSuccess(true)
         if (typeof window !== 'undefined') {
-          localStorage.setItem('_lsub', `${window.location.href}|${formData.phone}`)
+          localStorage.setItem('_lsub_done', '1')
           window.dataLayer = window.dataLayer || []
           const nameParts = formData.fullname.trim().split(' ')
           window.dataLayer.push({
