@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { PROJECT_ID, PROJECT_NAME, API_ENDPOINT, SHEET_NAME, SECRET_KEY, CITY_DISPLAY } from '../lib/config'
 import { getGeo, buildTrackingFields } from '../lib/formMeta'
 import Link from 'next/link'
@@ -17,6 +17,7 @@ const LeadForm = ({ formName = 'Hero Form', btnText = 'Submit Details' }) => {
   const [error, setError] = useState('')
   const [ipAddress, setIpAddress] = useState('')
   const [geoAddress, setGeoAddress] = useState(null)
+  const honeypotRef = useRef(null)
 
   useEffect(() => {
     getGeo().then(d => {
@@ -34,12 +35,23 @@ const LeadForm = ({ formName = 'Hero Form', btnText = 'Submit Details' }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!/^\d{10}$/.test(formData.phone)) { setError('Please enter a valid 10-digit mobile number.'); return }
+
+    /* ── Honeypot check (client-side) ── */
+    if (honeypotRef.current?.value !== '') { setSuccess(true); return }
+
+    /* ── Duplicate submission check ── */
+    if (typeof window !== 'undefined') {
+      const fingerprint = `${window.location.href}|${formData.phone}`
+      if (localStorage.getItem('_lsub') === fingerprint) { setSuccess(true); return }
+    }
+
     setError(''); setLoading(true)
     const tracking = buildTrackingFields(ipAddress, geoAddress)
     const payload = new FormData()
     payload.append('fullname', formData.fullname)
     payload.append('email', formData.email)
     payload.append('phone', formData.phone)
+    payload.append('website', honeypotRef.current?.value || '')
     payload.append('projectId', PROJECT_ID)
     payload.append('projectName', PROJECT_NAME)
     payload.append('form_name', formName)
@@ -53,6 +65,7 @@ const LeadForm = ({ formName = 'Hero Form', btnText = 'Submit Details' }) => {
       if (data.status) {
         setSuccess(true)
         if (typeof window !== 'undefined') {
+          localStorage.setItem('_lsub', `${window.location.href}|${formData.phone}`)
           window.dataLayer = window.dataLayer || []
           const nameParts = formData.fullname.trim().split(' ')
           window.dataLayer.push({
@@ -82,6 +95,9 @@ const LeadForm = ({ formName = 'Hero Form', btnText = 'Submit Details' }) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-1">
+      {/* Honeypot — hidden from users, filled by bots */}
+      <input ref={honeypotRef} type="text" name="website" tabIndex="-1" autoComplete="off"
+        style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
       <input type="text" name="fullname" required placeholder="Enter full name" value={formData.fullname} onChange={handleChange}
         className={inputClass} style={{ fontFamily: F_SANS }} />
       <input type="email" name="email" placeholder="Email Id (optional)" value={formData.email} onChange={handleChange}
