@@ -32,14 +32,56 @@ const nephilm = localFont({
 })
 
 export const metadata = {
-  title: 'Godrej Bannerghatta | 2, 3 & 4 BHK Luxury Apartments — Bannerghatta Road, South Bangalore',
-  description: 'Godrej Bannerghatta — Premium 2, 3 & 4 BHK luxury apartments on Bannerghatta Road, South Bangalore. 36-acre integrated township with world-class amenities. Starting ₹1.57 Cr*.',
+  title: 'Godrej Vanantara Bannerghatta Road | New Launch Bangalore',
+  description: 'Explore Godrej Vanantara on Bannerghatta Road, Bangalore. Premium 2, 3 & 4 BHK homes with modern amenities. Get price, floor plans & offers.',
+  icons: {
+    icon: [
+      { url: '/images/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/images/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/images/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [{ url: '/images/apple-touch-icon.png', sizes: '180x180' }],
+    shortcut: '/favicon.ico',
+  },
+  manifest: '/site.webmanifest',
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <GoogleTagManager gtmId="GTM-575H8R87" />
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://www.godrejnewlaunchbannerghatta.in/"
+              },
+              "headline": "Godrej Vanantara Bannerghatta Road | New Launch Bangalore",
+              "description": "Explore Godrej Vanantara on Bannerghatta Road, Bangalore. Premium 2, 3 & 4 BHK homes with modern amenities. Get price, floor plans & offers.",
+              "image": "https://www.godrejnewlaunchbannerghatta.in/_next/image?url=%2Fimages%2Fhero%2Fbanner.webp&w=1200&q=75",
+              "author": {
+                "@type": "Organization",
+                "name": "Proptiger",
+                "url": "https://proptiger.com/"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Proptiger",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://prod-static.proptiger.com/mobile/images/New-PropTiger-Logo-dark.34e3e8f4.svg"
+                }
+              },
+              "datePublished": "2026-04-22"
+            })
+          }}
+        />
+      </head>
       <body className={`${openSans.variable} ${montserrat.variable} ${cormorant.variable} ${nephilm.variable} font-sans text-dark antialiased`}>
         <Script id="gtag-init" strategy="beforeInteractive">
           {`window.dataLayer = window.dataLayer || [];
