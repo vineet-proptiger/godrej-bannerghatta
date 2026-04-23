@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { PROJECT_ID, PROJECT_NAME, API_ENDPOINT, SHEET_NAME, SECRET_KEY, CITY_DISPLAY } from '../lib/config'
-import { buildTrackingFields } from '../lib/formMeta'
+import { buildTrackingFields, isGclidBlocked, saveGclid } from '../lib/formMeta'
 
 const GOLD = 'var(--color-gold)'
 const GOLD_DARK = 'var(--color-gold-dark)'
@@ -15,7 +15,7 @@ const ContactCTA = () => {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
   useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem('_lsub_done') === '1') {
+    if (typeof window !== 'undefined' && (localStorage.getItem('_lsub_done') === '1' || isGclidBlocked())) {
       setSuccess(true)
     }
   }, [])
@@ -28,7 +28,7 @@ const ContactCTA = () => {
   const submit = async (e) => {
     e.preventDefault()
     if (!/^\d{10}$/.test(form.phone)) { setError('Enter valid 10-digit number'); return }
-    if (typeof window !== 'undefined' && localStorage.getItem('_lsub_done') === '1') { setSuccess(true); return }
+    if (typeof window !== 'undefined' && (localStorage.getItem('_lsub_done') === '1' || isGclidBlocked())) { setSuccess(true); return }
     setError(''); setLoading(true)
     const tracking = buildTrackingFields('', null)
     const payload = new FormData()
@@ -46,7 +46,7 @@ const ContactCTA = () => {
       const res = await fetch(API_ENDPOINT, { method: 'POST', body: payload })
       const data = await res.json()
       if (data.status) {
-        if (typeof window !== 'undefined') localStorage.setItem('_lsub_done', '1')
+        if (typeof window !== 'undefined') { localStorage.setItem('_lsub_done', '1'); saveGclid() }
         setSuccess(true)
       }
       else setError(data.msg || 'Something went wrong.')

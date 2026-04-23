@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { PROJECT_ID, PROJECT_NAME, API_ENDPOINT, SHEET_NAME, SECRET_KEY, CITY_DISPLAY } from '../lib/config'
-import { buildTrackingFields } from '../lib/formMeta'
+import { buildTrackingFields, isGclidBlocked, saveGclid } from '../lib/formMeta'
 import { overviewImage } from '../lib/images'
 import Link from 'next/link'
 
@@ -36,7 +36,7 @@ const EarlyForm = () => {
   const [alreadySubmitted, setAlreadySubmitted] = useState(false)
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem('_lsub_done') === '1') {
+    if (typeof window !== 'undefined' && (localStorage.getItem('_lsub_done') === '1' || isGclidBlocked())) {
       setAlreadySubmitted(true)
     }
   }, [])
@@ -63,7 +63,7 @@ const EarlyForm = () => {
       const res = await fetch(API_ENDPOINT, { method: 'POST', body: payload })
       const data = await res.json()
       if (data.status) {
-        if (typeof window !== 'undefined') localStorage.setItem('_lsub_done', '1')
+        if (typeof window !== 'undefined') { localStorage.setItem('_lsub_done', '1'); saveGclid() }
         setSuccess(true)
       }
       else setError(data.msg || 'Something went wrong.')

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react'
 import { PROJECT_ID, PROJECT_NAME, API_ENDPOINT, SHEET_NAME, SECRET_KEY, CITY_DISPLAY } from '../lib/config'
-import { buildTrackingFields } from '../lib/formMeta'
+import { buildTrackingFields, isGclidBlocked, saveGclid } from '../lib/formMeta'
 import Link from 'next/link'
 
 const GOLD = 'var(--color-gold)'
@@ -18,7 +18,7 @@ const LeadForm = ({ formName = 'Hero Form', btnText = 'Submit Details' }) => {
   const honeypotRef = useRef(null)
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem('_lsub_done') === '1') {
+    if (typeof window !== 'undefined' && (localStorage.getItem('_lsub_done') === '1' || isGclidBlocked())) {
       setSuccess(true)
     }
   }, [])
@@ -37,7 +37,7 @@ const LeadForm = ({ formName = 'Hero Form', btnText = 'Submit Details' }) => {
 
     /* ── Duplicate submission check ── */
     if (typeof window !== 'undefined') {
-      if (localStorage.getItem('_lsub_done') === '1') { setSuccess(true); return }
+      if (localStorage.getItem('_lsub_done') === '1' || isGclidBlocked()) { setSuccess(true); return }
     }
 
     setError(''); setLoading(true)
@@ -61,6 +61,7 @@ const LeadForm = ({ formName = 'Hero Form', btnText = 'Submit Details' }) => {
         setSuccess(true)
         if (typeof window !== 'undefined') {
           localStorage.setItem('_lsub_done', '1')
+          saveGclid()
           window.dataLayer = window.dataLayer || []
           const nameParts = formData.fullname.trim().split(' ')
           window.dataLayer.push({
