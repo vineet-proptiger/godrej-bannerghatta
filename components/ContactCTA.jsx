@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { PROJECT_ID, PROJECT_NAME, API_ENDPOINT, SHEET_NAME, SECRET_KEY, CITY_DISPLAY } from '../lib/config'
-import { getGeo, buildTrackingFields } from '../lib/formMeta'
+import { buildTrackingFields } from '../lib/formMeta'
 
 const GOLD = 'var(--color-gold)'
 const GOLD_DARK = 'var(--color-gold-dark)'
@@ -14,19 +14,10 @@ const ContactCTA = () => {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
-  const [ipAddress, setIpAddress] = useState('')
-  const [geoAddress, setGeoAddress] = useState(null)
-
   useEffect(() => {
     if (typeof window !== 'undefined' && localStorage.getItem('_lsub_done') === '1') {
       setSuccess(true)
-      return
     }
-    getGeo().then(d => {
-      if (!d) return
-      setIpAddress(d.ip || '')
-      setGeoAddress({ city: d.city, region: d.region, postal_code: d.postal_code, country: d.country })
-    })
   }, [])
 
   const handle = (e) => {
@@ -39,7 +30,7 @@ const ContactCTA = () => {
     if (!/^\d{10}$/.test(form.phone)) { setError('Enter valid 10-digit number'); return }
     if (typeof window !== 'undefined' && localStorage.getItem('_lsub_done') === '1') { setSuccess(true); return }
     setError(''); setLoading(true)
-    const tracking = buildTrackingFields(ipAddress, geoAddress)
+    const tracking = buildTrackingFields('', null)
     const payload = new FormData()
     payload.append('fullname', form.fullname)
     payload.append('phone', form.phone)

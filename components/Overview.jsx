@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { PROJECT_ID, PROJECT_NAME, API_ENDPOINT, SHEET_NAME, SECRET_KEY, CITY_DISPLAY } from '../lib/config'
-import { getGeo, buildTrackingFields } from '../lib/formMeta'
+import { buildTrackingFields } from '../lib/formMeta'
 import { overviewImage } from '../lib/images'
 import Link from 'next/link'
 
@@ -32,8 +32,6 @@ const EarlyForm = () => {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
-  const [ipAddress, setIpAddress] = useState('')
-  const [geoAddress, setGeoAddress] = useState(null)
   const [focused, setFocused] = useState('')
   const [alreadySubmitted, setAlreadySubmitted] = useState(false)
 
@@ -41,11 +39,6 @@ const EarlyForm = () => {
     if (typeof window !== 'undefined' && localStorage.getItem('_lsub_done') === '1') {
       setAlreadySubmitted(true)
     }
-    getGeo().then(d => {
-      if (!d) return
-      setIpAddress(d.ip || '')
-      setGeoAddress({ city: d.city, region: d.region, postal_code: d.postal_code, country: d.country })
-    })
   }, [])
 
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value })
@@ -54,7 +47,7 @@ const EarlyForm = () => {
     e.preventDefault()
     if (form.phone.length < 10) { setError('Enter valid 10-digit number'); return }
     setError(''); setLoading(true)
-    const tracking = buildTrackingFields(ipAddress, geoAddress)
+    const tracking = buildTrackingFields('', null)
     const payload = new FormData()
     payload.append('fullname', form.fullname)
     payload.append('email', form.email)
