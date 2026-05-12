@@ -50,6 +50,17 @@ const ContactForm = () => {
       if (data.status) {
         if (typeof window !== 'undefined') { localStorage.setItem('_lsub_done', '1'); saveGclid() }
         setSuccess(true)
+        if (typeof window !== 'undefined') {
+          window.dataLayer = window.dataLayer || []
+          const nameParts = form.fullname.trim().split(' ')
+          window.dataLayer.push({
+            event: 'lead_submit_success', form_name: 'Developer Section Form',
+            user_data: {
+              email: form.email.trim() || undefined, phone: `+91${form.phone}`,
+              first_name: nameParts[0] || '', last_name: nameParts.slice(1).join(' ') || ''
+            }
+          })
+        }
       }
       else setError(data.msg || 'Something went wrong.')
     } catch { setError('Network error. Please try again.') }
